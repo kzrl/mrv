@@ -23,11 +23,11 @@ func TestDefaults(t *testing.T) {
 	if cfg.Agent.MaxIterations != 0 {
 		t.Errorf("MaxIterations = %d, want 0", cfg.Agent.MaxIterations)
 	}
-	if !cfg.Tools.Shell.RequireConfirmation {
-		t.Error("Shell.RequireConfirmation should default to true")
+	if cfg.Tools.Shell.RequireConfirmation {
+		t.Error("Shell.RequireConfirmation should default to false")
 	}
-	if !cfg.Tools.WriteFile.RequireConfirmation {
-		t.Error("WriteFile.RequireConfirmation should default to true")
+	if cfg.Tools.WriteFile.RequireConfirmation {
+		t.Error("WriteFile.RequireConfirmation should default to false")
 	}
 }
 
@@ -56,9 +56,9 @@ tools: shell: requireConfirmation: false
 	if cfg.Tools.Shell.RequireConfirmation {
 		t.Error("Shell.RequireConfirmation should be false after override")
 	}
-	// writeFile confirm unchanged (not in override)
-	if !cfg.Tools.WriteFile.RequireConfirmation {
-		t.Error("WriteFile.RequireConfirmation should still be true")
+	// writeFile confirm unchanged by override — should still be the default (false)
+	if cfg.Tools.WriteFile.RequireConfirmation {
+		t.Error("WriteFile.RequireConfirmation should still be false (schema default)")
 	}
 }
 

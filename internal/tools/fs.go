@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"strings"
 
 	"google.golang.org/adk/tool"
 	"google.golang.org/adk/tool/functiontool"
@@ -41,6 +42,26 @@ type ListFilesResult struct {
 	Files []string `json:"files"`
 }
 
+// EditFileArgs are the input arguments for the EditFile tool.
+type EditFileArgs struct {
+	Path      string `json:"path"       jsonschema_description:"Path to the file to edit"`
+	OldString string `json:"old_string" jsonschema_description:"Exact string to find and replace. Must appear exactly once in the file."`
+	NewString string `json:"new_string" jsonschema_description:"Replacement string"`
+}
+
+// EditFileResult is the output of the EditFile tool.
+type EditFileResult struct {
+	OK bool `json:"ok"`
+}
+
+// NewEditFileTool creates a tool that performs a targeted string replacement in a file.
+func NewEditFileTool() (tool.Tool, error) {
+	return functiontool.New(functiontool.Config{
+		Name:        "edit_file",
+		Description: "Replace an exact string in a file. old_string must appear exactly once; use more surrounding context to make it unique if needed.",
+	}, editFile)
+}
+
 // NewReadFileTool creates a tool that reads a file from disk.
 func NewReadFileTool() (tool.Tool, error) {
 	return functiontool.New(functiontool.Config{
@@ -65,6 +86,28 @@ func NewListFilesTool() (tool.Tool, error) {
 		Name:        "list_files",
 		Description: "List files in a directory. Set recursive=true to walk subdirectories.",
 	}, listFiles)
+}
+
+func editFile(_ tool.Context, args EditFileArgs) (EditFileResult, error) {
+	data, err := os.ReadFile(args.Path)
+	if err != nil {
+		return EditFileResult{}, fmt.Errorf("edit_file: %w", err)
+	}
+	content := string(data)
+
+	n := strings.Count(content, args.OldString)
+	switch {
+	case n == 0:
+		return EditFileResult{}, fmt.Errorf("edit_file: old_string not found in %s", args.Path)
+	case n > 1:
+		return EditFileResult{}, fmt.Errorf("edit_file: old_string found %d times in %s; add more context to make it unique", n, args.Path)
+	}
+
+	updated := strings.Replace(content, args.OldString, args.NewString, 1)
+	if err := os.WriteFile(args.Path, []byte(updated), 0o644); err != nil {
+		return EditFileResult{}, fmt.Errorf("edit_file: %w", err)
+	}
+	return EditFileResult{OK: true}, nil
 }
 
 func readFile(_ tool.Context, args ReadFileArgs) (ReadFileResult, error) {

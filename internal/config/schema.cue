@@ -8,6 +8,6 @@ agent: {
 	systemPrompt?: string
 }
 tools: {
-	shell:     {requireConfirmation: bool | *true}
-	writeFile: {requireConfirmation: bool | *true}
+	shell:     {requireConfirmation: bool | *false}
+	writeFile: {requireConfirmation: bool | *false}
 }

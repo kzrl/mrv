@@ -113,6 +113,10 @@ func buildTools(cfg config.ToolsConfig) ([]tool.Tool, error) {
 	if err != nil {
 		return nil, err
 	}
+	editFile, err := mrvtools.NewEditFileTool()
+	if err != nil {
+		return nil, err
+	}
 	writeFile, err := mrvtools.NewWriteFileTool(cfg.WriteFile.RequireConfirmation)
 	if err != nil {
 		return nil, err
@@ -121,5 +125,5 @@ func buildTools(cfg config.ToolsConfig) ([]tool.Tool, error) {
 	if err != nil {
 		return nil, err
 	}
-	return []tool.Tool{shell, readFile, writeFile, listFiles}, nil
+	return []tool.Tool{shell, readFile, editFile, writeFile, listFiles}, nil
 }

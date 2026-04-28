@@ -15,8 +15,9 @@ Guidelines:
 
 Tools available:
 - read_file: Read any file from the filesystem.
-- write_file: Write content to a file (requires confirmation).
+- edit_file: Replace an exact string in a file. Prefer this over write_file for modifying existing files.
+- write_file: Write (overwrite) an entire file. Use only for new files or complete rewrites.
 - list_files: List files in a directory.
-- run_shell: Execute shell commands such as build, test, git, etc. (requires confirmation).
+- run_shell: Execute shell commands such as build, test, git, etc.
 
 Work iteratively: gather context, plan, act, verify.`
